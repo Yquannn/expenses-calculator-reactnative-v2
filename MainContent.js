@@ -4,7 +4,7 @@ import styles from './CardStyle.js';
 import Inputstyles from './InputStyle.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Card() {
+export default function Home() {
   const formatNumberWithCommas = (number) => {
     if (number == null) return "0";
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

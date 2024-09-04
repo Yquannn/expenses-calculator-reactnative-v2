@@ -1,33 +1,34 @@
 import * as React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Card from './Card';
-import Details from './Details';
-import Savings from './Savings';
+import {View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import Home from './MainContent';
+import Details from './Details'
+import Savings from './Savings'
+import { SafeAreaView } from 'react-native';
 
 function HomeScreen() {
   return (
-    <View style={{ flex: 1 }}>
-      <Card />
-    </View>
+    <SafeAreaView>
+      <Home/>
+  </SafeAreaView>
   );
 }
 
-function SettingsScreen() {
+function DetailsScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Details />
-    </View>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Details/>
+    </SafeAreaView>
   );
 }
 
 function SavingsScreen() {
   return (
-    <View style={styles.savingsContainer}>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Savings/>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -38,43 +39,25 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
+          tabBarIcon: ({ color, size }) => {
             let iconName;
 
             if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
+              iconName = 'home-outline';
             } else if (route.name === 'Details') {
-              iconName = focused ? 'information-circle' : 'information-circle-outline';
+              iconName = 'list-outline';
             } else if (route.name === 'Savings') {
-              iconName = focused ? 'cash' : 'cash-outline';
+              iconName = 'wallet-outline';
             }
 
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Icon name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: 'tomato',
-          tabBarInactiveTintColor: 'gray',
-          tabBarLabelStyle: { fontSize: 12 },
-          tabBarStyle: { backgroundColor: 'white' },
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Details" component={SettingsScreen} />
+        <Tab.Screen name="Details" component={DetailsScreen} />
         <Tab.Screen name="Savings" component={SavingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  savingsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2', // Light gray background
-  },
-  savingsText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333', // Darker text color
-  },
-});
