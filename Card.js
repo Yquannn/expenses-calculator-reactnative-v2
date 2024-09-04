@@ -3,7 +3,6 @@ import { View, Text, TextInput, Alert, Pressable, ScrollView } from 'react-nativ
 import styles from './CardStyle.js';  
 import Inputstyles from './InputStyle.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loadData } from './LoadData'; // Import the utility function
 
 export default function Card() {
   const formatNumberWithCommas = (number) => {
@@ -16,6 +15,8 @@ export default function Card() {
   const [expenses, setExpenses] = useState();
   const [isDisabled, setIsDisabled] = useState(false);
   const [list, setList] = useState([]);
+  const [savings, setSavings] = useState();
+
   // const [listOfExpenses, setListOfExpenses] = useState([]);
   const [userAllowanceInput, setUserAllowanceInput] = useState('');
   const [userExpensesInput, setUserExpensesInput] = useState('');
@@ -24,8 +25,29 @@ export default function Card() {
   const parsedAllowance = parseFloat(userAllowanceInput.replace(/,/g, '')) || 0;
   const parsedExpenses = parseFloat(userExpensesInput.replace(/,/g, '')) || 0;
 
+  const handleDeposit = async () => {
+    try {
+      console.log('Current balance:', balance);
+      
+      const savedSavings = await AsyncStorage.getItem('savings');
+      const parsedSavings = savedSavings ? JSON.parse(savedSavings) : 0;
+      
+      const totalSaving = (parsedSavings || 0) + (balance || 0);
+      
+      await AsyncStorage.setItem('savings', JSON.stringify(totalSaving));
+      
+      setSavings(totalSaving);
+      
+      console.log('Total savings:', totalSaving);
+      handleClear()
+      Alert.alert('Deposit successfully')
+    } catch (error) {
+      console.error('Error updating savings:', error);
+    }
+  };
+  
+  
 
-  //nested array for getting the list of expenses and details
   const handleSave = async () => {
     try {
       if (userExpensesInput.length === 0) {
@@ -59,6 +81,7 @@ export default function Card() {
       const getAllowance = await AsyncStorage.getItem('allowance');
       const getExpenses = await AsyncStorage.getItem('expenses');
       const getList = await AsyncStorage.getItem('list'); 
+      
       // const getListOfExpenses = await AsyncStorage.getItem('listOfExpenses'); 
 
 
@@ -81,7 +104,7 @@ export default function Card() {
       setExpenses(totalExpenses);
 
       if (totalExpenses > allowanceValue) {
-        Alert.alert('Expenses Alert', 'Your expenses exceed your budget.');
+        Alert.alert('Your expenses exceed your budget. The exceed limit deducted to your savings');
       }
 
       const calculatedBalance = allowanceValue - totalExpenses;
@@ -116,6 +139,9 @@ export default function Card() {
             toggleDisable();
           }
         }
+        const savedSavings = await AsyncStorage.getItem('savings');
+        const parsedSavings = savedSavings ? JSON.parse(savedSavings) : 0;
+        setSavings(parsedSavings);
         loadAllowanceAndExpenses();
       } catch (error) {
         console.error('Error retrieving allowance:', error);
@@ -130,24 +156,30 @@ export default function Card() {
 
   const handleClear = async () => {
     try {
-      await AsyncStorage.clear();
+      // Clear specific keys from AsyncStorage
+      await AsyncStorage.removeItem('allowance');
+      await AsyncStorage.removeItem('balance');
+      await AsyncStorage.removeItem('expenses');
+      await AsyncStorage.removeItem('list');
+      
+      // Reset state variables
       setBalance(0);
       setAllowance(0);
       setExpenses(0);
       setUserAllowanceInput('');
       setUserExpensesInput('');
-      setList([]); 
-
+      setList([]);
+  
+      // Enable inputs again
       setIsDisabled(false);
+  
+      // Notify user
       Alert.alert('Cleared');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
     }
   };
-
-  const handleDeposit = () => {
-
-  }
+  
 
   return (
     <>
@@ -155,9 +187,12 @@ export default function Card() {
         <View style={styles.card}>
           <View style={styles.headerContainer}>
             <Text style={styles.balanceLbl}>Available Budget</Text>
+            <Text style={styles.balanceLbl}>Savings</Text>
+
           </View>
           <View style={styles.balanceContainer}>
             <Text style={styles.balanceCurrency}>PHP <Text style={styles.balance}>{displayBalance}</Text></Text>
+            <Text style={styles.ExpensesCurrency}>PHP <Text style={styles.Expensesbalance}>{formatNumberWithCommas(savings) + '.00'}</Text></Text>
           </View>
           <View style={styles.horizontalLine}></View>
           <View style={styles.headerContainer}>

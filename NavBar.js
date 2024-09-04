@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Card from './Card';
 import Details from './Details';
+import Savings from './Savings';
 
 function HomeScreen() {
   return (
@@ -25,7 +26,7 @@ function SettingsScreen() {
 function SavingsScreen() {
   return (
     <View style={styles.savingsContainer}>
-      <Text style={styles.savingsText}>Savings</Text>
+      <Savings/>
     </View>
   );
 }
